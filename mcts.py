@@ -7,21 +7,21 @@ class node(object):
         self.curOrder = curOrder
         self.terminal = False
         self.Q_value = None
-        self.reward = None
+        self.reward = 0
         self.parent = None
+        self.n_visit = None
 
     def __str__(self, level=0):
-        ret = "\t"*level+repr(self.value)+"\n"
+        ret = "\t"*level+repr(self.value,self.Q_value)+"\n"
         for child in self.children:
             ret += child.__str__(level+1)
         return ret
 
     def __repr__(self):
-        return '<tree node representation>'
+        return(str(self.value))
 
 #initialising definitions
 def anyWinner(array):
-    print(array)
     if (array[0] == array[1] == array[2]) and array[0]!= '' and  array[1]!= '' and array[2]!='':
         return True
     if (array[0] == array[3] == array[6]) and array[0]!= '' and  array[3]!= '' and array[6]!='':
@@ -52,6 +52,53 @@ def isTerminal(order):
     if anyWinner(TicTacToe):
         return True
     return False
+
+def getReward(order):
+    if len(order)%2==1:
+        return(-1)
+    else:
+        return(1)
+
+states = [x for x in range(9)]
+def buidlTree(self):
+    if isTerminal(self.curOrder):
+        self.terminal = True
+        self.reward = getReward(self.curOrder)
+        self.Q_value = self.reward
+        self.n_Visit = 1
+        return
+    else:
+        self.children = [node(x) for x in states if x not in self.curOrder]
+        for child in self.children:
+            child.parent = self
+            child.curOrder = child.parent.curOrder + [child.value]
+            buidlTree(child)
+
+def countSubNodes(self):
+    if self.terminal:
+        return 1
+    nodeCount = len(self.children)
+    for child in self.children:
+        nodeCount += countSubNodes(child)
+    return nodeCount
+
+def calcQ(self):
+    if self.terminal:
+        return self.Q_value
+    if self.Q_value is None:
+        qValue = 0
+        for child in self.children:
+            if child.n_visit is None:
+                child.n_visit = countSubNodes(child)
+            if child.Q_value is None:
+                child.Q_value = calcQ(child)
+            qValue += ((child.reward + child.Q_value)/child.n_visit)
+        self.Q_value = qValue
+        return qValue
+    
+        
+    
+
 #%%
 #Starting constrction of tree and hardcoding the starting state
 #root node
@@ -72,6 +119,17 @@ step3.children = [node(5)]
 step4 = step3.children[0]
 step4.parent = step3
 step4.curOrder = step4.parent.curOrder + [step4.value]
-step4.children = [node(0),node(1),node(6),node(7),node(8)]
 # %%
+# Completing the tree
+buidlTree(step4)
+
+#%%
+print(calcQ(root))
+
+
+# %%
+print(step4.Q_value)
+# %%
+for child in step4.children[0].children[0].children:
+    print(child.value,child.Q_value)
 # %%
