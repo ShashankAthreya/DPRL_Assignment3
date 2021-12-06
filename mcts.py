@@ -111,16 +111,16 @@ def calcQ(self):
                 child.n_visit = countSubNodes(child)
             if child.Q_value is None:
                 child.Q_value = calcQ(child)
-            qValue += ((child.reward + child.Q_value)/child.n_visit)
+            qValue += ((child.reward + Gamma*child.Q_value)/child.n_visit)
         self.Q_value = qValue
         return qValue
 #%%
 def clearScreen():
     os.system('clear')
-
 #%%
 #Starting constrction of tree and hardcoding the starting state
 #root node
+Gamma = 1
 # root = node(4)
 root = node(5)
 # initialNode = int(input("Player X: Starting State ->"))
