@@ -1,4 +1,6 @@
 #%%
+import numpy as np
+import os
 #initilaing tree class
 class node(object):
     def __init__(self, value, children = [],curOrder = []):
@@ -21,6 +23,11 @@ class node(object):
         return(str(self.value))
 
 #initialising definitions
+# '''
+# 0|1|2
+# 3|4|5
+# 6|7|8
+# '''
 def anyWinner(array):
     if (array[0] == array[1] == array[2]) and array[0]!= '' and  array[1]!= '' and array[2]!='':
         return True
@@ -73,7 +80,7 @@ def buidlTree(self):
     if isTerminal(self.curOrder):
         self.terminal = True
         if len(self.curOrder) == 9 and anyWinner(T3(self.curOrder)) is False:
-            self.reward = -1
+            self.reward = 0
         else:
             self.reward = getReward(self.curOrder)
         self.Q_value = self.reward
@@ -107,11 +114,15 @@ def calcQ(self):
             qValue += ((child.reward + child.Q_value)/child.n_visit)
         self.Q_value = qValue
         return qValue
+#%%
+def clearScreen():
+    os.system('clear')
 
 #%%
 #Starting constrction of tree and hardcoding the starting state
 #root node
-root = node(4)
+initialNode = int(input("Player X: Starting State ->"))
+root = node(initialNode)
 root.curOrder= [root.value]
 # root.children = [node(1)]
 # #child node
@@ -132,9 +143,49 @@ root.curOrder= [root.value]
 # Completing the tree and calculating Q values
 buidlTree(root)
 print(calcQ(root))
+clearScreen()
 # %%
-print(root)
+# print(root)
 # %%
-for child in root.children[1].children[6].children[0].children[0].children[2].children:
-    print(child.parent.value,child.value, child.Q_value,)
+#Traversing through tree to check it's validity 
+# for child in root.children:
+#     print(child.curOrder, child.Q_value)
+# %%
+# Starting Game
+players = ['X','O']
+curPlayer = 'X'
+curNode = root
+while(not curNode.terminal):
+    curPlayer = [x for x in players if x is not curPlayer][0]
+    print("Current Player", curPlayer)
+    curGame = T3(curNode.curOrder)
+    for i in range(len(curGame)):
+        print(curGame[i]," | ",end='')
+        if(i%3==2 and i!=8):
+            print("\n---|---|---\n")
+    qvalues = []
+    for child in curNode.children:
+        qvalues.append(child.Q_value)
+        print("\n",curNode.curOrder, child.value, child.Q_value)
+    if curPlayer == 'X':
+        optimalNode = curNode.children[np.argmax(qvalues)]
+    if curPlayer == 'O':
+        optimalNode = curNode.children[np.argmin(qvalues)]
+    print("\nOptimal Node for player",curPlayer,"is: ", optimalNode.value)
+    nextNode = int(input("Choose a node"))
+    try:
+        index = [x for x in range(len(curNode.children)) if curNode.children[x].value == nextNode][0]
+    except:
+        print("Enter a vald state")
+        continue
+    nextNode = curNode.children[index]
+    curNode = nextNode
+    clearScreen()
+
+if curNode.terminal:
+    if anyWinner(T3(curNode.curOrder)):
+        winner = 'X' if len(curNode.curOrder)%2==1 else 'O'
+        print("Player ",winner," wins")
+    else:
+        print("Draw")
 # %%
